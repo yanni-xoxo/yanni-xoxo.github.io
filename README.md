@@ -7,7 +7,7 @@ Pipeline: **Google Form → Google Sheet → GitHub Action sync → GitHub Pages
 
 - Filters by **Pokémon species** (items can belong to **multiple** species via Form checkboxes)
 - **No Approved column** — every form response is published
-- **Daily scheduled full resync** (UTC 16:00) plus manual append/full runs
+- **Manual** append/full sync via GitHub Actions
 
 ---
 
@@ -83,17 +83,15 @@ Live URLs after deploy:
 2. Actions → **Sync Pokémon catalogue** → Run workflow → mode **append**.
 3. Confirm `pkmncollection/collection.json` and `images/` updated, then check the live page.
 
-Scheduled runs use **full** sync every day at **16:00 UTC** (midnight HKT). Change the cron in `.github/workflows/sync-pkmncollection.yml` if needed.
-
 ---
 
 ## Day-to-day
 
 1. Submit items on the Form (or via `/pkmncollection/add`).
-2. Wait for the daily sync, or run **Sync Pokémon catalogue** manually:
+2. Run **Sync Pokémon catalogue** manually (Actions → Run workflow):
    - **append** — only new rows not yet Synced
    - **full** — re-read every row; drop items whose sheet rows were deleted
-3. To remove an item: delete the row in the Sheet, then run **full** (or wait for the daily full sync).
+3. To remove an item: delete the row in the Sheet, then run **full**.
 
 ---
 

@@ -1,9 +1,6 @@
 name: Sync Pokémon catalogue
 
 on:
-    schedule:
-        # Daily full resync (UTC). Adjust if you want a different local time.
-        - cron: "0 16 * * *"
     workflow_dispatch:
         inputs:
             mode:
@@ -51,23 +48,12 @@ jobs:
             - name: Install sync dependencies
               run: pip install -r scripts/requirements-pkmncollection-sync.txt
 
-            - name: Resolve sync mode
-              id: mode
-              shell: bash
-              run: |
-                  if [ "${{ github.event_name }}" = "schedule" ]; then
-                      echo "mode=full" >> "$GITHUB_OUTPUT"
-                      echo "Scheduled run: using full sync."
-                  else
-                      echo "mode=${{ inputs.mode }}" >> "$GITHUB_OUTPUT"
-                  fi
-
             - name: Sync catalogue from Google Sheet
               env:
                   GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
                   PKMNCOLLECTION_SHEET_ID: ${{ secrets.PKMNCOLLECTION_SHEET_ID }}
               run: |
-                  if [ "${{ steps.mode.outputs.mode }}" = "full" ]; then
+                  if [ "${{ inputs.mode }}" = "full" ]; then
                       python scripts/sync_pkmncollection.py --full
                   else
                       python scripts/sync_pkmncollection.py
@@ -86,7 +72,7 @@ jobs:
                       exit 0
                   fi
 
-                  if [ "${{ steps.mode.outputs.mode }}" = "full" ]; then
+                  if [ "${{ inputs.mode }}" = "full" ]; then
                       msg="chore(pkmncollection): full resync catalogue from Google Sheet"
                   else
                       msg="chore(pkmncollection): sync new items from Google Form"
